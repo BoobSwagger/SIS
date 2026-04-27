@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Student;
+use App\Models\SystemNotification;
 
 class AuthController extends Controller
 {
@@ -53,7 +54,7 @@ class AuthController extends Controller
             'password'   => 'required|min:6'
         ]);
 
-        // 1. Check if the Student ID actually exists in the database (Instructor Requirement)
+        // 1. Check if the Student ID actually exists in the database
         $studentRecord = Student::where('student_id', $request->student_id)->first();
         if (!$studentRecord) {
             return back()->withErrors(['student_id' => 'Signup Rejected: This Student ID does not exist in the system.']);
@@ -66,12 +67,17 @@ class AuthController extends Controller
         }
 
         // 3. Create the user account! 
-        // We use their real name from the student record, and their student_id as the username
         $user = User::create([
             'name'     => $studentRecord->first_name . ' ' . $studentRecord->last_name,
             'username' => $request->student_id,
             'password' => Hash::make($request->password),
             'role'     => 'student'
+        ]);
+
+        // --- NEW: Trigger Activation Notification ---
+        SystemNotification::create([
+            'type' => 'activation',
+            'message' => "<strong>{$user->username}</strong> successfully activated their account."
         ]);
 
         // 4. Log them in and send them to their portal

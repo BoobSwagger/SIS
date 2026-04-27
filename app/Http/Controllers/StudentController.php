@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\SystemNotification; // Added for notifications
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -72,6 +73,12 @@ class StudentController extends Controller
         // 2. Finds the student and updates their record
         $student = Student::findOrFail($id);
         $student->update($validatedData);
+
+        // --- NEW: Trigger Update Notification ---
+        SystemNotification::create([
+            'type' => 'update',
+            'message' => "<strong>{$student->first_name} {$student->last_name}</strong> updated their personal data."
+        ]);
 
         // 3. Sends you back to the list
         return redirect('/students');

@@ -5,6 +5,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\CheckAdmin;
 use App\Http\Middleware\CheckStudent;
+use App\Http\Controllers\AdminController;
 
 // --- Default Route ---
 Route::get('/', function () {
@@ -31,6 +32,9 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/students/{id}', [StudentController::class, 'update']);
         Route::delete('/students/{id}', [StudentController::class, 'destroy']);
         Route::delete('/students/truncate', [StudentController::class, 'truncate']);
+        Route::put('/admin/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
+        Route::delete('/admin/wipe-database', [AdminController::class, 'wipeDatabase'])->name('admin.database.wipe');
+        Route::delete('/admin/notifications/clear', [App\Http\Controllers\AdminController::class, 'clearNotifications'])->name('admin.notifications.clear');
     });
 
     // 2. STUDENT ONLY ROUTES (Protected by our new CheckStudent class)

@@ -14,4 +14,9 @@ class Student extends Model
     'course',
     'gender'
 ];
+// Links the student to their user account via their ID
+public function account()
+{
+    return $this->belongsTo(User::class, 'student_id', 'username');
+}
 }
